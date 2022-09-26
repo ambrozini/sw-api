@@ -1,0 +1,25 @@
+service: sw-api
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+
+functions:
+  getAll:
+    handler: src/characters/handler.getAll
+    events:
+     - http:
+        path: characters
+        method: get
+        cors: true
+
+plugins:
+  - serverless-offline
+  - serverless-esbuild
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
