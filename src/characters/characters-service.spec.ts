@@ -1,5 +1,8 @@
+import { ActionResult, Error } from "@shared";
 import service from "./characters-service";
-import { Character } from "./model/character";
+import { Character, Episodes } from "./model/character";
+import { CharacterServiceErrors } from "./model/errors";
+import { last } from "lodash";
 
 describe("Characters Service", () => {
   describe("getAll", () => {
@@ -69,6 +72,56 @@ describe("Characters Service", () => {
             },
           ]
         `);
+    });
+  });
+
+  describe("create", () => {
+    describe("with valid data", () => {
+      let result: ActionResult<void, typeof CharacterServiceErrors>;
+
+      beforeEach(() => {
+        result = service.create({
+          name: "Master Yoda",
+          episodes: [Episodes.EMPIRE, Episodes.JEDI],
+        });
+      });
+
+      it("should result be successful", () => {
+        expect(result.success).toEqual(true);
+      });
+
+      it("should add character as last element", () => {
+        expect(last(service.getAll())).toMatchInlineSnapshot(`
+          {
+            "episodes": [
+              "EMPIRE",
+              "JEDI",
+            ],
+            "name": "Master Yoda",
+          }
+        `);
+      });
+    });
+
+    describe("with not unique name", () => {
+      let result: ActionResult<void, typeof CharacterServiceErrors>;
+
+      beforeEach(() => {
+        result = service.create({
+          name: "Luke Skywalker",
+          episodes: [],
+        });
+      });
+
+      it("should result be successful", () => {
+        expect(result.success).toEqual(false);
+      });
+
+      it("should add character as last element", () => {
+        expect((result as Error<typeof CharacterServiceErrors>).error).toEqual(
+          "ALREADY_EXISTS"
+        );
+      });
     });
   });
 });

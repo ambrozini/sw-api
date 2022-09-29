@@ -1,5 +1,7 @@
-import middy from "@middy/core";
-import { Response } from "@shared/response";
-import { getAll as getAllController } from "./characters-controller";
+import { Response, middify } from "@shared";
+import controller from "./characters-controller";
+import { Character } from "./model/character";
 
-export const getAll = middy<void, Response>(getAllController);
+export const getAll = middify<void, Response>(controller.getAll);
+
+export const create = middify<Character, Response>(controller.create);

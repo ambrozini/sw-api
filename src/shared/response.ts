@@ -1,5 +1,12 @@
-export interface Response {
+export type Response = {
   statusCode: number;
   headers?: { [key: string]: string };
-  body: string;
+} & (SuccessResponse | ErrorResponse);
+
+export interface SuccessResponse {
+  body?: string;
+}
+
+export interface ErrorResponse {
+  error?: string;
 }

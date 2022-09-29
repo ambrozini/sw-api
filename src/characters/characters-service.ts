@@ -1,6 +1,8 @@
+import { ActionResult, errorAction, successAction } from "@shared";
 import { Character, Episodes } from "./model/character";
+import { CharacterServiceErrors } from "./model/errors";
 
-const characters = [
+const characters: Character[] = [
   {
     name: "Luke Skywalker",
     episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
@@ -36,4 +38,20 @@ const getAll = (): Character[] => {
   return [...characters];
 };
 
-export default { getAll };
+const create = (
+  character: Character
+): ActionResult<null, typeof CharacterServiceErrors> => {
+  if (
+    characters.some(
+      (existingCharacter) => existingCharacter.name === character.name
+    )
+  ) {
+    return errorAction("ALREADY_EXISTS");
+  }
+
+  characters.push(character);
+
+  return successAction();
+};
+
+export default { getAll, create };
