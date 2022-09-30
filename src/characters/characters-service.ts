@@ -34,13 +34,13 @@ const characters: Character[] = [
   },
 ];
 
-const getAll = (): Character[] => {
+export const getAll = (): Character[] => {
   return [...characters];
 };
 
-const create = (
+export const create = (
   character: Character
-): ActionResult<null, typeof CharacterServiceErrors> => {
+): ActionResult<null, CharacterServiceErrors> => {
   if (
     characters.some(
       (existingCharacter) => existingCharacter.name === character.name
@@ -49,9 +49,11 @@ const create = (
     return errorAction("ALREADY_EXISTS");
   }
 
+  if (!character.name) {
+    return errorAction("VALIDATION_ERROR", `Name doesn't exists`);
+  }
+
   characters.push(character);
 
   return successAction();
 };
-
-export default { getAll, create };

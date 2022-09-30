@@ -1,9 +1,11 @@
-import { Response, isActionResultFailure } from "@shared";
-import service from "./characters-service";
+import { Response, isActionResultFailure, Error } from "@shared";
+import { StatusCodes } from "http-status-codes";
+
+import * as service from "./characters-service";
 import { Character } from "./model/character";
 import { CharacterServiceErrors } from "./model/errors";
 
-const getAll = async (): Promise<Response> => {
+export const getAll = async (): Promise<Response> => {
   const characters = service.getAll();
 
   return {
@@ -12,7 +14,7 @@ const getAll = async (): Promise<Response> => {
   };
 };
 
-const create = async ({
+export const create = async ({
   body: character,
 }: {
   body: Character;
@@ -20,7 +22,7 @@ const create = async ({
   const result = service.create(character);
 
   if (isActionResultFailure(result)) {
-    return mapError(result.error);
+    return mapError(result);
   }
 
   return {
@@ -28,14 +30,17 @@ const create = async ({
   };
 };
 
-export default { getAll, create };
-
-function mapError(error: typeof CharacterServiceErrors[number]): Response {
-  switch (error) {
+function mapError(error: Error<CharacterServiceErrors>): Response {
+  switch (error.errorCode) {
     case "ALREADY_EXISTS":
       return {
-        statusCode: 409,
+        statusCode: StatusCodes.CONFLICT,
         error: "Character with such name already exists",
+      };
+    case "VALIDATION_ERROR":
+      return {
+        statusCode: StatusCodes.BAD_REQUEST,
+        error: error.message,
       };
   }
 }

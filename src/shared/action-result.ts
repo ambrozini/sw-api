@@ -7,7 +7,8 @@ export interface Success<T> {
 
 export interface Error<T extends ErrorList> {
   success: false;
-  error: T[number];
+  errorCode: T[number];
+  message?: string;
 }
 
 export type ActionResult<TData, TError extends ErrorList> =
@@ -32,8 +33,10 @@ export const successAction = <T>(data: T = null): Success<T> => ({
 });
 
 export const errorAction = <T extends readonly string[]>(
-  error: T[number]
+  errorCode: T[number],
+  message?: string
 ): Error<T> => ({
   success: false,
-  error,
+  errorCode,
+  message,
 });

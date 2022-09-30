@@ -1,11 +1,11 @@
-import { HttpEvent, Response } from "@shared";
+import { ErrorResponse, HttpEvent, SuccessResponse } from "@shared";
 import { noop } from "lodash";
 import { Character } from "src/characters/model/character";
 import { create } from "../src/characters/handler";
 
 describe("Characters Integration Tests", () => {
-  describe("create", () => {
-    let response: Response;
+  describe("create with valid data", () => {
+    let response: SuccessResponse;
     it("should return successfull response", async () => {
       response = (await create(
         {
@@ -17,8 +17,52 @@ describe("Characters Integration Tests", () => {
         } as HttpEvent<Character>,
         null,
         noop
-      )) as Response;
-      expect(response).toBeDefined();
+      )) as SuccessResponse;
+      expect(response.statusCode).toEqual(201);
+    });
+  });
+
+  describe("create with repetition data", () => {
+    let response: ErrorResponse;
+
+    beforeEach(async () => {
+      response = (await create(
+        {
+          httpMethod: "POST",
+          body: {
+            name: "Luke Skywalker",
+            episodes: [],
+          },
+        } as HttpEvent<Character>,
+        null,
+        noop
+      )) as ErrorResponse;
+    });
+
+    it("should return status code 409", async () => {
+      expect(response.statusCode).toEqual(409);
+    });
+
+    it("should return error message", async () => {
+      expect(response.error).toEqual("Character with such name already exists");
+    });
+  });
+
+  describe("create with invalid data", () => {
+    let response: ErrorResponse;
+
+    it("should return error code 400", async () => {
+      response = (await create(
+        {
+          httpMethod: "POST",
+          body: {
+            episodes: [],
+          },
+        } as HttpEvent<Character>,
+        null,
+        noop
+      )) as ErrorResponse;
+      expect(response.statusCode).toEqual(400);
     });
   });
 });
