@@ -23,6 +23,14 @@ functions:
         method: post
         cors: true
 
+  delete:
+    handler: src/characters/handler.deleteOne
+    events:
+     - http:
+        path: characters
+        method: delete
+        cors: true
+
 plugins:
   - serverless-offline
   - serverless-esbuild

@@ -70,3 +70,19 @@ export const create = (
 
   return successAction();
 };
+
+export const deleteOne = (
+  name: string
+): ActionResult<null, CharacterServiceErrors> => {
+  const characterList = getAll();
+
+  if (!name) {
+    return errorAction("VALIDATION_ERROR", "Name doesn't exists");
+  }
+
+  if (characterList.every((character) => character.name !== name)) {
+    return errorAction("NOT_EXISTS");
+  }
+
+  return successAction();
+};

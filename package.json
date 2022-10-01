@@ -5,7 +5,9 @@
   "scripts": {
     "test": "jest",
     "test:dev": "jest --watch-all",
-    "start": "nodemon --exec serverless offline",
+    "start": "serverless offline",
+    "start:dev": "nodemon --exec serverless offline",
+    "debug": "export SLS_DEBUG=* && nodemon --exec serverless offline",
     "eslint": "eslint ."
   },
   "engines": {

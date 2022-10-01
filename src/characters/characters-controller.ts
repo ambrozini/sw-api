@@ -1,4 +1,9 @@
-import { Response, isActionResultFailure, ErrorResult } from "@shared";
+import {
+  Response,
+  isActionResultFailure,
+  ErrorResult,
+  ErrorResponse,
+} from "@shared";
 import { StatusCodes } from "http-status-codes";
 
 import * as service from "./characters-service";
@@ -28,27 +33,49 @@ export const create = async ({
 
     return {
       statusCode: StatusCodes.CREATED,
+      body: null,
     };
   } catch (e) {
     return {
       statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-      error: "Something went wrong! Please contact administration",
+      body: "Something went wrong! Please contact administration",
     };
   }
 };
 
-function mapError(error: ErrorResult<CharacterServiceErrors>): Response {
+export const deleteOne = async ({
+  body,
+}: {
+  body: { name: string };
+}): Promise<Response> => {
+  const result = service.deleteOne(body.name);
+
+  if (isActionResultFailure(result)) {
+    return mapError(result);
+  }
+
+  return { statusCode: StatusCodes.NO_CONTENT, body: null };
+};
+
+function mapError(error: ErrorResult<CharacterServiceErrors>): ErrorResponse {
   switch (error?.errorCode) {
     case "ALREADY_EXISTS":
       return {
         statusCode: StatusCodes.CONFLICT,
-        error: "Character with such name already exists",
+        body: "Character with such name already exists",
       };
     case "VALIDATION_ERROR":
       return {
         statusCode: StatusCodes.BAD_REQUEST,
-        error: error.message,
+        body: error.message,
       };
+
+    case "NOT_EXISTS":
+      return {
+        statusCode: StatusCodes.NOT_FOUND,
+        body: "Such character doesn't exists",
+      };
+
     default:
       throw new Error("Unkown Error");
   }

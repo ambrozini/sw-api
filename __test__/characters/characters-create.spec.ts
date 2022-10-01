@@ -6,7 +6,7 @@ import * as service from "../../src/characters/characters-service";
 
 describe("Characters Integration Tests - create", () => {
   describe("with valid data", () => {
-    let response: SuccessResponse;
+    let response: SuccessResponse<Character>;
     it("should return successfull response", async () => {
       response = (await create(
         {
@@ -18,7 +18,7 @@ describe("Characters Integration Tests - create", () => {
         } as HttpEvent<Character>,
         null,
         noop
-      )) as SuccessResponse;
+      )) as SuccessResponse<Character>;
       expect(response.statusCode).toEqual(201);
     });
   });
@@ -45,7 +45,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should return error message", async () => {
-      expect(response.error).toEqual("Character with such name already exists");
+      expect(response.body).toEqual("Character with such name already exists");
     });
   });
 
@@ -70,7 +70,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should return error message", async () => {
-      expect(response.error).toEqual(`Name doesn't exists`);
+      expect(response.body).toEqual(`Name doesn't exists`);
     });
   });
 
@@ -96,7 +96,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should return error message", async () => {
-      expect(response.error).toEqual(
+      expect(response.body).toEqual(
         "Character have to be at least in one episode"
       );
     });
@@ -123,7 +123,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should return error message", async () => {
-      expect(response.error).toEqual("Episodes list doesn't exists");
+      expect(response.body).toEqual("Episodes list doesn't exists");
     });
   });
 
@@ -151,7 +151,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should return error message", async () => {
-      expect(response.error).toEqual(
+      expect(response.body).toEqual(
         "Something went wrong! Please contact administration"
       );
     });

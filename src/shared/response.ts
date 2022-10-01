@@ -1,13 +1,13 @@
 import { StatusCodes } from "http-status-codes";
 
-export type Response = SuccessResponse | ErrorResponse;
+export type Response<T = null> = SuccessResponse<T> | ErrorResponse;
 
-export interface SuccessResponse extends CommonResponse {
-  body?: string;
-}
+export type SuccessResponse<T> = CommonResponse & {
+  body: T;
+};
 
 export interface ErrorResponse extends CommonResponse {
-  error?: string;
+  body: string;
 }
 interface CommonResponse {
   statusCode: StatusCodes;
