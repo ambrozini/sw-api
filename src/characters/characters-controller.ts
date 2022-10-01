@@ -1,16 +1,11 @@
-import {
-  Response,
-  isActionResultFailure,
-  ErrorResult,
-  ErrorResponse,
-} from "@shared";
+import { Response, isActionResultFailure } from "@shared";
 import { StatusCodes } from "http-status-codes";
 
 import * as service from "./characters-service";
+import { mapError } from "./map-error";
 import { Character } from "./model/character";
-import { CharacterServiceErrors } from "./model/errors";
 
-export const getAll = async (): Promise<Response> => {
+export const getAll = async (): Promise<Response<Character[]>> => {
   const characters = service.getAll();
 
   return {
@@ -33,7 +28,6 @@ export const create = async ({
 
     return {
       statusCode: StatusCodes.CREATED,
-      body: null,
     };
   } catch (e) {
     return {
@@ -54,29 +48,5 @@ export const deleteOne = async ({
     return mapError(result);
   }
 
-  return { statusCode: StatusCodes.NO_CONTENT, body: null };
+  return { statusCode: StatusCodes.NO_CONTENT };
 };
-
-function mapError(error: ErrorResult<CharacterServiceErrors>): ErrorResponse {
-  switch (error?.errorCode) {
-    case "ALREADY_EXISTS":
-      return {
-        statusCode: StatusCodes.CONFLICT,
-        body: "Character with such name already exists",
-      };
-    case "VALIDATION_ERROR":
-      return {
-        statusCode: StatusCodes.BAD_REQUEST,
-        body: error.message,
-      };
-
-    case "NOT_EXISTS":
-      return {
-        statusCode: StatusCodes.NOT_FOUND,
-        body: "Such character doesn't exists",
-      };
-
-    default:
-      throw new Error("Unkown Error");
-  }
-}

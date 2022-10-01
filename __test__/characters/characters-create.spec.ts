@@ -6,7 +6,7 @@ import * as service from "../../src/characters/characters-service";
 
 describe("Characters Integration Tests - create", () => {
   describe("with valid data", () => {
-    let response: SuccessResponse<Character>;
+    let response: SuccessResponse;
     it("should return successfull response", async () => {
       response = (await create(
         {
@@ -18,7 +18,7 @@ describe("Characters Integration Tests - create", () => {
         } as HttpEvent<Character>,
         null,
         noop
-      )) as SuccessResponse<Character>;
+      )) as SuccessResponse;
       expect(response.statusCode).toEqual(201);
     });
   });
