@@ -1,4 +1,4 @@
-import { Response, isActionResultFailure, Error } from "@shared";
+import { Response, isActionResultFailure, ErrorResult } from "@shared";
 import { StatusCodes } from "http-status-codes";
 
 import * as service from "./characters-service";
@@ -19,19 +19,26 @@ export const create = async ({
 }: {
   body: Character;
 }): Promise<Response> => {
-  const result = service.create(character);
+  try {
+    const result = service.create(character);
 
-  if (isActionResultFailure(result)) {
-    return mapError(result);
+    if (isActionResultFailure(result)) {
+      return mapError(result);
+    }
+
+    return {
+      statusCode: StatusCodes.CREATED,
+    };
+  } catch (e) {
+    return {
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      error: "Something went wrong! Please contact administration",
+    };
   }
-
-  return {
-    statusCode: 201,
-  };
 };
 
-function mapError(error: Error<CharacterServiceErrors>): Response {
-  switch (error.errorCode) {
+function mapError(error: ErrorResult<CharacterServiceErrors>): Response {
+  switch (error?.errorCode) {
     case "ALREADY_EXISTS":
       return {
         statusCode: StatusCodes.CONFLICT,
@@ -42,5 +49,7 @@ function mapError(error: Error<CharacterServiceErrors>): Response {
         statusCode: StatusCodes.BAD_REQUEST,
         error: error.message,
       };
+    default:
+      throw new Error("Unkown Error");
   }
 }

@@ -41,8 +41,10 @@ export const getAll = (): Character[] => {
 export const create = (
   character: Character
 ): ActionResult<null, CharacterServiceErrors> => {
+  const characterList = getAll();
+
   if (
-    characters.some(
+    characterList.some(
       (existingCharacter) => existingCharacter.name === character.name
     )
   ) {
@@ -50,10 +52,21 @@ export const create = (
   }
 
   if (!character.name) {
-    return errorAction("VALIDATION_ERROR", `Name doesn't exists`);
+    return errorAction("VALIDATION_ERROR", "Name doesn't exists");
   }
 
-  characters.push(character);
+  if (!character.episodes) {
+    return errorAction("VALIDATION_ERROR", "Episodes list doesn't exists");
+  }
+
+  if (character.episodes.length === 0) {
+    return errorAction(
+      "VALIDATION_ERROR",
+      "Character have to be at least in one episode"
+    );
+  }
+
+  characterList.push(character);
 
   return successAction();
 };
