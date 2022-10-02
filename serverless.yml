@@ -2,9 +2,13 @@ service: sw-api
 
 frameworkVersion: '3'
 
+useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs14.x
+  environment:
+
 
 functions:
   find:
@@ -34,6 +38,7 @@ functions:
 plugins:
   - serverless-offline
   - serverless-esbuild
+  - serverless-dotenv-plugin
 
 custom:
   esbuild:

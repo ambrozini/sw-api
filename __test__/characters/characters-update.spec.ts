@@ -4,11 +4,11 @@ import { Character, Episodes } from "src/characters/model/character";
 import { update } from "../../src/characters/handler";
 import * as service from "../../src/characters/characters-service";
 import { findCharacter } from "./helpers/findCharacter";
-import { CharacterRepository } from "src/characters/character-repository";
+import { seedDb } from "./helpers/seedDb";
 
 describe("Characters Integration Tests - update", () => {
-  beforeEach(() => {
-    CharacterRepository.getInstance().clearData();
+  beforeEach(async () => {
+    await seedDb();
   });
 
   describe("with valid data", () => {

@@ -11,7 +11,7 @@ export const find = async ({
   queryStringParameters: { [key: string]: string };
 }): Promise<Response<Character[]>> => {
   if (
-    queryStringParameters.limit &&
+    queryStringParameters?.limit &&
     isNaN(Number(queryStringParameters.limit))
   ) {
     return {
@@ -21,7 +21,7 @@ export const find = async ({
   }
 
   if (
-    queryStringParameters.offset &&
+    queryStringParameters?.offset &&
     isNaN(Number(queryStringParameters.offset))
   ) {
     return {
@@ -31,16 +31,16 @@ export const find = async ({
   }
 
   const options = {
-    limit: queryStringParameters.limit
+    limit: queryStringParameters?.limit
       ? parseInt(queryStringParameters.limit, 10)
       : undefined,
 
-    offset: queryStringParameters.offset
+    offset: queryStringParameters?.offset
       ? parseInt(queryStringParameters.offset, 10)
       : undefined,
   };
 
-  const result = service.find(options);
+  const result = await service.find(options);
 
   if (isActionResultFailure(result)) {
     return mapError(result);
@@ -57,7 +57,7 @@ export const findOne = async ({
 }: {
   pathParameters: { [key: string]: string };
 }): Promise<Response<Character>> => {
-  const result = service.findOne(pathParameters.userName);
+  const result = await service.findOne(pathParameters.userName);
 
   if (isActionResultFailure(result)) {
     return mapError(result);
@@ -75,7 +75,7 @@ export const create = async ({
   body: Character;
 }): Promise<Response> => {
   try {
-    const result = service.create(character);
+    const result = await service.create(character);
 
     if (isActionResultFailure(result)) {
       return mapError(result);
@@ -97,7 +97,7 @@ export const deleteOne = async ({
 }: {
   body: { name: string };
 }): Promise<Response> => {
-  const result = service.deleteOne(body.name);
+  const result = await service.deleteOne(body.name);
 
   if (isActionResultFailure(result)) {
     return mapError(result);
@@ -112,7 +112,7 @@ export const update = async ({
   body: Character;
 }): Promise<Response> => {
   try {
-    const result = service.update(character);
+    const result = await service.update(character);
 
     if (isActionResultFailure(result)) {
       return mapError(result);

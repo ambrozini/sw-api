@@ -9,5 +9,5 @@ module.exports = {
   modulePaths: [
       '<rootDir>'
   ],
-
+  globalSetup: "<rootDir>/__test__/globalSetup.ts",
 };

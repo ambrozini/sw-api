@@ -1,56 +1,25 @@
-import { drop, take } from "lodash";
-import { Character, Episodes } from "./model/character";
+import { Character } from "./model/character";
+
+import { MongoClient } from "mongodb";
 
 export class CharacterRepository {
   private static instance: CharacterRepository;
 
-  private characters: Character[] = [];
+  private client: MongoClient;
 
   private constructor() {
-    this.clearData();
+    this.client = new MongoClient(process.env.MONGO_URI);
   }
 
-  static getInstance(): CharacterRepository {
+  static async getInstance(): Promise<CharacterRepository> {
     if (!this.instance) {
       this.instance = new CharacterRepository();
     }
 
+    await this.instance.client.connect();
+
     return this.instance;
   }
-
-  clearData() {
-    this.characters = [
-      {
-        name: "Luke Skywalker",
-        episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-      },
-      {
-        name: "Darth Vader",
-        episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-      },
-      {
-        name: "Han Solo",
-        episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-      },
-      {
-        name: "Leia Organa",
-        episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-        planet: "Alderaan",
-      },
-      {
-        name: "Wilhuff Tarkin",
-        episodes: [Episodes.NEWHOPE],
-      },
-      {
-        name: "C-3PO",
-        episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-      },
-      {
-        name: "R2-D2",
-        episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-      },
-    ];
-  } // TODO remove when switching into real db
 
   find({
     limit = 5,
@@ -58,34 +27,50 @@ export class CharacterRepository {
   }: {
     limit: number;
     offset: number;
-  }): Character[] {
-    return take(drop([...this.characters], offset), limit);
-  }
+  }): Promise<Character[]> {
+    console.log(limit);
+    console.log(offset);
 
-  findOne(userName: string): Character | undefined {
-    return this.characters.find((character) => character.name === userName);
-  }
-
-  exists(predicate: (character: Character) => boolean): boolean {
-    return this.characters.some((character) => predicate(character));
-  }
-
-  create(character: Character) {
-    this.characters.push(character);
-  }
-
-  delete(name: string) {
-    this.characters = this.characters.filter(
-      (character) => character.name !== name
+    return (
+      this.client
+        .db("sw")
+        .collection("characters")
+        // .find<Character>({ skip: offset, limit, _id: false })
+        .find<Character>({ _id: false })
+        .toArray()
     );
   }
 
-  update(characterToUpdate: Character) {
-    this.characters = [
-      ...this.characters.filter(
-        (character) => character.name !== characterToUpdate.name
-      ),
-      characterToUpdate,
-    ];
+  findOne(name: string): Promise<Character | null> {
+    return this.client.db("sw").collection("characters").findOne<Character>({
+      name,
+      _id: false,
+    });
+  }
+
+  async exists(name: string): Promise<boolean> {
+    const count = await this.client
+      .db("sw")
+      .collection("characters")
+      .countDocuments({
+        name,
+      });
+
+    return count === 1;
+  }
+
+  async create(character: Character): Promise<void> {
+    await this.client.db("sw").collection("characters").insertOne(character);
+  }
+
+  async delete(name: string): Promise<void> {
+    await this.client.db("sw").collection("characters").deleteOne({ name });
+  }
+
+  async update(characterToUpdate: Character): Promise<void> {
+    await this.client
+      .db("sw")
+      .collection("characters")
+      .updateOne({ name: characterToUpdate.name }, characterToUpdate);
   }
 }

@@ -2,8 +2,13 @@ import { HttpEvent, SuccessResponse } from "@shared";
 import { findOne } from "../../src/characters/handler";
 import { noop } from "lodash";
 import { Character } from "src/characters/model/character";
+import { seedDb } from "./helpers/seedDb";
 
 describe("Characters Integration Tests - find", () => {
+  beforeEach(async () => {
+    await seedDb();
+  });
+
   describe("with valid request", () => {
     let response: SuccessResponse<Character>;
 

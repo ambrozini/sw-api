@@ -3,28 +3,23 @@ import { CharacterRepository } from "./character-repository";
 import { Character, Episodes } from "./model/character";
 import { CharacterServiceErrors } from "./model/errors";
 
-export const find = (options: {
+export const find = async (options: {
   limit: number;
   offset: number;
-}): ActionResult<Character[], CharacterServiceErrors> => {
-  const repository = CharacterRepository.getInstance();
+}): Promise<ActionResult<Character[], CharacterServiceErrors>> => {
+  const repository = await CharacterRepository.getInstance();
 
-  const results = repository.find(options);
+  const results = await repository.find(options);
 
   return successAction(results);
 };
 
-export const create = (
+export const create = async (
   character: Character
-): ActionResult<null, CharacterServiceErrors> => {
-  const repository = CharacterRepository.getInstance();
+): Promise<ActionResult<null, CharacterServiceErrors>> => {
+  const repository = await CharacterRepository.getInstance();
 
-  if (
-    repository.exists(
-      (existingCharacter: Character) =>
-        existingCharacter.name === character.name
-    )
-  ) {
+  if (!(await repository.exists(character.name))) {
     return errorAction("ALREADY_EXISTS");
   }
 
@@ -51,33 +46,33 @@ export const create = (
     return errorAction("VALIDATION_ERROR", "Such episode doesn't exist");
   }
 
-  repository.create(character);
+  await repository.create(character);
 
   return successAction();
 };
 
-export const deleteOne = (
+export const deleteOne = async (
   name: string
-): ActionResult<null, CharacterServiceErrors> => {
-  const repository = CharacterRepository.getInstance();
+): Promise<ActionResult<null, CharacterServiceErrors>> => {
+  const repository = await CharacterRepository.getInstance();
 
   if (!name) {
     return errorAction("VALIDATION_ERROR", "Name doesn't exists");
   }
 
-  if (!repository.exists((character) => character.name === name)) {
+  if (!(await repository.exists(name))) {
     return errorAction("NOT_EXISTS");
   }
 
-  repository.delete(name);
+  await repository.delete(name);
 
   return successAction();
 };
 
-export const update = (
+export const update = async (
   character: Character
-): ActionResult<null, CharacterServiceErrors> => {
-  const repository = CharacterRepository.getInstance();
+): Promise<ActionResult<null, CharacterServiceErrors>> => {
+  const repository = await CharacterRepository.getInstance();
 
   if (!character.name) {
     return errorAction("VALIDATION_ERROR", "Name doesn't exists");
@@ -102,11 +97,7 @@ export const update = (
     return errorAction("VALIDATION_ERROR", "Such episode doesn't exist");
   }
 
-  if (
-    !repository.exists(
-      (currentCharacter) => currentCharacter.name === character.name
-    )
-  ) {
+  if (!(await repository.exists(character.name))) {
     return errorAction("NOT_EXISTS");
   }
 
@@ -114,9 +105,10 @@ export const update = (
 
   return successAction();
 };
-export function findOne(
+
+export const findOne = async (
   userName: string
-): ActionResult<Character, CharacterServiceErrors> {
+): Promise<ActionResult<Character, CharacterServiceErrors>> => {
   if (!userName) {
     return errorAction<CharacterServiceErrors>(
       "VALIDATION_ERROR",
@@ -124,13 +116,13 @@ export function findOne(
     );
   }
 
-  const repository = CharacterRepository.getInstance();
+  const repository = await CharacterRepository.getInstance();
 
-  const result = repository.findOne(userName);
+  const result = await repository.findOne(userName);
 
   if (!result) {
     return errorAction("NOT_EXISTS");
   }
 
   return successAction(result);
-}
+};

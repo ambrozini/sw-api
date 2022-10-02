@@ -3,12 +3,12 @@ import { noop } from "lodash";
 import { Character, Episodes } from "src/characters/model/character";
 import { create } from "../../src/characters/handler";
 import * as service from "../../src/characters/characters-service";
-import { CharacterRepository } from "src/characters/character-repository";
 import { findCharacter } from "./helpers/findCharacter";
+import { seedDb } from "./helpers/seedDb";
 
 describe("Characters Integration Tests - create", () => {
-  beforeEach(() => {
-    CharacterRepository.getInstance().clearData();
+  beforeEach(async () => {
+    await seedDb();
   });
 
   describe("with valid data", () => {
