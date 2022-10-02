@@ -5,7 +5,7 @@ const client: MongoClient = new MongoClient(process.env.MONGO_URI);
 
 export const seedDb = async () => {
   await client.db("sw").collection("characters").deleteMany({});
-  const result = await client
+  await client
     .db("sw")
     .collection("characters")
     .insertMany([
@@ -39,6 +39,4 @@ export const seedDb = async () => {
         episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
       },
     ]);
-
-  console.log(result);
 };

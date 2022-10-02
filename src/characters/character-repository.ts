@@ -56,6 +56,8 @@ export class CharacterRepository {
         name,
       });
 
+    console.log(name);
+
     return count === 1;
   }
 

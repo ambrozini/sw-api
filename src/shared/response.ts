@@ -8,13 +8,20 @@ export type SuccessResponse<T = null> = CommonResponse &
         body?: null;
       }
     : {
-        body: T;
+        body: string;
+        headers: typeof jsonHeader & {
+          [key: string]: string;
+        };
       });
 
 export interface ErrorResponse extends CommonResponse {
   body: string;
+  headers: typeof textHeader & { [key: string]: string };
 }
 interface CommonResponse {
   statusCode: StatusCodes;
   headers?: { [key: string]: string };
 }
+
+export const jsonHeader = { "Content-Type": "application/json" } as const;
+export const textHeader = { "Content-Type": "text/plain" } as const;

@@ -1,4 +1,9 @@
-import { Response, isActionResultFailure } from "@shared";
+import {
+  Response,
+  isActionResultFailure,
+  textHeader,
+  jsonHeader,
+} from "@shared";
 import { StatusCodes } from "http-status-codes";
 
 import * as service from "./characters-service";
@@ -17,6 +22,7 @@ export const find = async ({
     return {
       statusCode: 400,
       body: "Limit has to be integer",
+      headers: textHeader,
     };
   }
 
@@ -27,6 +33,7 @@ export const find = async ({
     return {
       statusCode: 400,
       body: "Offset has to be integer",
+      headers: textHeader,
     };
   }
 
@@ -48,7 +55,8 @@ export const find = async ({
 
   return {
     statusCode: 200,
-    body: result.data,
+    body: JSON.stringify(result.data),
+    headers: jsonHeader,
   };
 };
 
@@ -65,7 +73,8 @@ export const findOne = async ({
 
   return {
     statusCode: 200,
-    body: result.data,
+    body: JSON.stringify(result.data),
+    headers: jsonHeader,
   };
 };
 
@@ -88,6 +97,7 @@ export const create = async ({
     return {
       statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
       body: "Something went wrong! Please contact administration",
+      headers: textHeader,
     };
   }
 };
@@ -125,6 +135,7 @@ export const update = async ({
     return {
       statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
       body: "Something went wrong! Please contact administration",
+      headers: textHeader,
     };
   }
 };

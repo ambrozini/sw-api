@@ -19,7 +19,7 @@ export const create = async (
 ): Promise<ActionResult<null, CharacterServiceErrors>> => {
   const repository = await CharacterRepository.getInstance();
 
-  if (!(await repository.exists(character.name))) {
+  if (await repository.exists(character.name)) {
     return errorAction("ALREADY_EXISTS");
   }
 
