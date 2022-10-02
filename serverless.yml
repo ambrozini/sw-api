@@ -7,8 +7,8 @@ provider:
   runtime: nodejs14.x
 
 functions:
-  getAll:
-    handler: src/characters/handler.getAll
+  find:
+    handler: src/characters/handler.find
     events:
      - http:
         path: characters

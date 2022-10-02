@@ -1,51 +1,28 @@
 import { ActionResult, errorAction, successAction } from "@shared";
+import { CharacterRepository } from "./character-repository";
 import { Character, Episodes } from "./model/character";
 import { CharacterServiceErrors } from "./model/errors";
 
-const characters: Character[] = [
-  {
-    name: "Luke Skywalker",
-    episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-  },
-  {
-    name: "Darth Vader",
-    episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-  },
-  {
-    name: "Han Solo",
-    episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-  },
-  {
-    name: "Leia Organa",
-    episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-    planet: "Alderaan",
-  },
-  {
-    name: "Wilhuff Tarkin",
-    episodes: [Episodes.NEWHOPE],
-  },
-  {
-    name: "C-3PO",
-    episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-  },
-  {
-    name: "R2-D2",
-    episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-  },
-];
+export const find = (options: {
+  limit: number;
+  offset: number;
+}): ActionResult<Character[], CharacterServiceErrors> => {
+  const repository = CharacterRepository.getInstance();
 
-export const getAll = (): Character[] => {
-  return [...characters];
+  const results = repository.find(options);
+
+  return successAction(results);
 };
 
 export const create = (
   character: Character
 ): ActionResult<null, CharacterServiceErrors> => {
-  const characterList = getAll();
+  const repository = CharacterRepository.getInstance();
 
   if (
-    characterList.some(
-      (existingCharacter) => existingCharacter.name === character.name
+    repository.exists(
+      (existingCharacter: Character) =>
+        existingCharacter.name === character.name
     )
   ) {
     return errorAction("ALREADY_EXISTS");
@@ -74,7 +51,7 @@ export const create = (
     return errorAction("VALIDATION_ERROR", "Such episode doesn't exist");
   }
 
-  characterList.push(character);
+  // characterList.push(character);
 
   return successAction();
 };
@@ -82,13 +59,13 @@ export const create = (
 export const deleteOne = (
   name: string
 ): ActionResult<null, CharacterServiceErrors> => {
-  const characterList = getAll();
+  const repository = CharacterRepository.getInstance();
 
   if (!name) {
     return errorAction("VALIDATION_ERROR", "Name doesn't exists");
   }
 
-  if (characterList.every((character) => character.name !== name)) {
+  if (!repository.exists((character) => character.name === name)) {
     return errorAction("NOT_EXISTS");
   }
 
@@ -98,7 +75,7 @@ export const deleteOne = (
 export const update = (
   character: Character
 ): ActionResult<null, CharacterServiceErrors> => {
-  let characterList = getAll();
+  const repository = CharacterRepository.getInstance();
 
   if (!character.name) {
     return errorAction("VALIDATION_ERROR", "Name doesn't exists");
@@ -124,19 +101,39 @@ export const update = (
   }
 
   if (
-    characterList.every(
-      (currentCharacter) => currentCharacter.name !== character.name
+    !repository.exists(
+      (currentCharacter) => currentCharacter.name === character.name
     )
   ) {
     return errorAction("NOT_EXISTS");
   }
 
-  characterList = [
-    ...characterList.filter(
-      (currentCharacter) => currentCharacter.name === character.name
-    ),
-    character,
-  ];
+  // characterList = [
+  //   ...characterList.filter(
+  //     (currentCharacter) => currentCharacter.name === character.name
+  //   ),
+  //   character,
+  // ];
 
   return successAction();
 };
+export function findOne(
+  userName: string
+): ActionResult<Character, CharacterServiceErrors> {
+  if (!userName) {
+    return errorAction<CharacterServiceErrors>(
+      "VALIDATION_ERROR",
+      "No username"
+    );
+  }
+
+  const repository = CharacterRepository.getInstance();
+
+  const result = repository.findOne(userName);
+
+  if (!result) {
+    return errorAction("NOT_EXISTS");
+  }
+
+  return successAction(result);
+}

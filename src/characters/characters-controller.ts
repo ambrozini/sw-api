@@ -5,12 +5,67 @@ import * as service from "./characters-service";
 import { mapError } from "./map-error";
 import { Character } from "./model/character";
 
-export const getAll = async (): Promise<Response<Character[]>> => {
-  const characters = service.getAll();
+export const find = async ({
+  queryStringParameters = {},
+}: {
+  queryStringParameters: { [key: string]: string };
+}): Promise<Response<Character[]>> => {
+  if (
+    queryStringParameters.limit &&
+    isNaN(Number(queryStringParameters.limit))
+  ) {
+    return {
+      statusCode: 400,
+      body: "Limit has to be integer",
+    };
+  }
+
+  if (
+    queryStringParameters.offset &&
+    isNaN(Number(queryStringParameters.offset))
+  ) {
+    return {
+      statusCode: 400,
+      body: "Offset has to be integer",
+    };
+  }
+
+  const options = {
+    limit: queryStringParameters.limit
+      ? parseInt(queryStringParameters.limit, 10)
+      : undefined,
+
+    offset: queryStringParameters.offset
+      ? parseInt(queryStringParameters.offset, 10)
+      : undefined,
+  };
+
+  const result = service.find(options);
+
+  if (isActionResultFailure(result)) {
+    return mapError(result);
+  }
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ characters }),
+    body: result.data,
+  };
+};
+
+export const findOne = async ({
+  pathParameters = {},
+}: {
+  pathParameters: { [key: string]: string };
+}): Promise<Response<Character>> => {
+  const result = service.findOne(pathParameters.userName);
+
+  if (isActionResultFailure(result)) {
+    return mapError(result);
+  }
+
+  return {
+    statusCode: 200,
+    body: result.data,
   };
 };
 
