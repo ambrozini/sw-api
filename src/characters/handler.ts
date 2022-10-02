@@ -10,3 +10,5 @@ export const create = middify<Character, Response>(controller.create);
 export const deleteOne = middify<{ name: string }, Response>(
   controller.deleteOne
 );
+
+export const update = middify<Character, Response>(controller.update);

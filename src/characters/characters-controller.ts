@@ -50,3 +50,26 @@ export const deleteOne = async ({
 
   return { statusCode: StatusCodes.NO_CONTENT };
 };
+
+export const update = async ({
+  body: character,
+}: {
+  body: Character;
+}): Promise<Response> => {
+  try {
+    const result = service.update(character);
+
+    if (isActionResultFailure(result)) {
+      return mapError(result);
+    }
+
+    return {
+      statusCode: StatusCodes.NO_CONTENT,
+    };
+  } catch (e) {
+    return {
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      body: "Something went wrong! Please contact administration",
+    };
+  }
+};

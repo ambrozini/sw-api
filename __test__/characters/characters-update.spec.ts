@@ -1,51 +1,25 @@
 import { ErrorResponse, HttpEvent, SuccessResponse } from "@shared";
 import { noop } from "lodash";
 import { Character, Episodes } from "src/characters/model/character";
-import { create } from "../../src/characters/handler";
+import { update } from "../../src/characters/handler";
 import * as service from "../../src/characters/characters-service";
 
-describe("Characters Integration Tests - create", () => {
+describe("Characters Integration Tests - update", () => {
   describe("with valid data", () => {
     let response: SuccessResponse;
     it("should return successfull response", async () => {
-      response = (await create(
+      response = (await update(
         {
-          httpMethod: "POST",
+          httpMethod: "PUT",
           body: {
-            name: "Master Yoda",
-            episodes: [Episodes.EMPIRE, Episodes.JEDI],
+            name: "Luke Skywalker",
+            episodes: [Episodes.EMPIRE],
           },
         } as HttpEvent<Character>,
         null,
         noop
       )) as SuccessResponse;
-      expect(response.statusCode).toEqual(201);
-    });
-  });
-
-  describe("with repetition data", () => {
-    let response: ErrorResponse;
-
-    beforeEach(async () => {
-      response = (await create(
-        {
-          httpMethod: "POST",
-          body: {
-            name: "Luke Skywalker",
-            episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
-          },
-        } as HttpEvent<Character>,
-        null,
-        noop
-      )) as ErrorResponse;
-    });
-
-    it("should return status code 409", async () => {
-      expect(response.statusCode).toEqual(409);
-    });
-
-    it("should return error message", async () => {
-      expect(response.body).toEqual("Character with such name already exists");
+      expect(response.statusCode).toEqual(204);
     });
   });
 
@@ -53,9 +27,9 @@ describe("Characters Integration Tests - create", () => {
     let response: ErrorResponse;
 
     beforeEach(async () => {
-      response = (await create(
+      response = (await update(
         {
-          httpMethod: "POST",
+          httpMethod: "PUT",
           body: {
             episodes: [Episodes.NEWHOPE],
           },
@@ -78,12 +52,37 @@ describe("Characters Integration Tests - create", () => {
     let response: ErrorResponse;
 
     beforeEach(async () => {
-      response = (await create(
+      response = (await update(
         {
-          httpMethod: "POST",
+          httpMethod: "PUT",
           body: {
             name: "Master Yoda",
-            episodes: [],
+            episodes: [Episodes.NEWHOPE],
+          },
+        } as HttpEvent<Character>,
+        null,
+        noop
+      )) as ErrorResponse;
+    });
+
+    it("should return error code 400", async () => {
+      expect(response.statusCode).toEqual(404);
+    });
+
+    it("should return error message", async () => {
+      expect(response.body).toEqual("Such character doesn't exists");
+    });
+  });
+
+  describe("without list of episodes", () => {
+    let response: ErrorResponse;
+
+    beforeEach(async () => {
+      response = (await update(
+        {
+          httpMethod: "PUT",
+          body: {
+            name: "Luke Skywalker",
           },
         } as HttpEvent<Character>,
         null,
@@ -96,9 +95,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should return error message", async () => {
-      expect(response.body).toEqual(
-        "Character have to be at least in one episode"
-      );
+      expect(response.body).toEqual("Episodes list doesn't exists");
     });
   });
 
@@ -106,11 +103,11 @@ describe("Characters Integration Tests - create", () => {
     let response: ErrorResponse;
 
     beforeEach(async () => {
-      response = (await create(
+      response = (await update(
         {
           httpMethod: "POST",
           body: {
-            name: "Master Yoda",
+            name: "Luke Skywalker",
             episodes: ["Not_Episode"],
           },
         } as HttpEvent<unknown> as HttpEvent<Character>,
@@ -128,13 +125,13 @@ describe("Characters Integration Tests - create", () => {
     });
   });
 
-  describe("without list of episodes", () => {
+  describe("without not existing character", () => {
     let response: ErrorResponse;
 
     beforeEach(async () => {
-      response = (await create(
+      response = (await update(
         {
-          httpMethod: "POST",
+          httpMethod: "PUT",
           body: {
             name: "Master Yoda",
           },
@@ -157,12 +154,12 @@ describe("Characters Integration Tests - create", () => {
     let response: ErrorResponse;
 
     beforeEach(async () => {
-      jest.spyOn(service, "create").mockImplementation(() => {
+      jest.spyOn(service, "update").mockImplementation(() => {
         throw new Error("Error");
       });
-      response = (await create(
+      response = (await update(
         {
-          httpMethod: "POST",
+          httpMethod: "PUT",
           body: {
             name: "Master Yoda",
           },

@@ -66,6 +66,14 @@ export const create = (
     );
   }
 
+  if (
+    character.episodes.some(
+      (episode) => !Object.values(Episodes).includes(episode)
+    )
+  ) {
+    return errorAction("VALIDATION_ERROR", "Such episode doesn't exist");
+  }
+
   characterList.push(character);
 
   return successAction();
@@ -83,6 +91,52 @@ export const deleteOne = (
   if (characterList.every((character) => character.name !== name)) {
     return errorAction("NOT_EXISTS");
   }
+
+  return successAction();
+};
+
+export const update = (
+  character: Character
+): ActionResult<null, CharacterServiceErrors> => {
+  let characterList = getAll();
+
+  if (!character.name) {
+    return errorAction("VALIDATION_ERROR", "Name doesn't exists");
+  }
+
+  if (!character.episodes) {
+    return errorAction("VALIDATION_ERROR", "Episodes list doesn't exists");
+  }
+
+  if (character.episodes.length === 0) {
+    return errorAction(
+      "VALIDATION_ERROR",
+      "Character have to be at least in one episode"
+    );
+  }
+
+  if (
+    character.episodes.some(
+      (episode) => !Object.values(Episodes).includes(episode)
+    )
+  ) {
+    return errorAction("VALIDATION_ERROR", "Such episode doesn't exist");
+  }
+
+  if (
+    characterList.every(
+      (currentCharacter) => currentCharacter.name !== character.name
+    )
+  ) {
+    return errorAction("NOT_EXISTS");
+  }
+
+  characterList = [
+    ...characterList.filter(
+      (currentCharacter) => currentCharacter.name === character.name
+    ),
+    character,
+  ];
 
   return successAction();
 };
