@@ -73,4 +73,10 @@ export class CharacterRepository {
   create(character: Character) {
     this.characters.push(character);
   }
+
+  delete(name: string) {
+    this.characters = this.characters.filter(
+      (character) => character.name !== name
+    );
+  }
 }

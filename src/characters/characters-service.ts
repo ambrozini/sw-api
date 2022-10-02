@@ -69,6 +69,8 @@ export const deleteOne = (
     return errorAction("NOT_EXISTS");
   }
 
+  repository.delete(name);
+
   return successAction();
 };
 

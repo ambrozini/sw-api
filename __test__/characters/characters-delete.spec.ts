@@ -1,11 +1,18 @@
 import { HttpEvent, SuccessResponse, ErrorResponse } from "@shared";
 import { deleteOne } from "../../src/characters/handler";
 import { noop } from "lodash";
+import { findCharacter } from "./helpers/findCharacter";
+import { CharacterRepository } from "src/characters/character-repository";
 
 describe("Characters Integration Tests - delete", () => {
+  beforeEach(() => {
+    CharacterRepository.getInstance().clearData();
+  });
+
   describe("with valid name", () => {
     let response: SuccessResponse<null>;
-    it("should return successfull response", async () => {
+
+    beforeEach(async () => {
       response = (await deleteOne(
         {
           httpMethod: "DELETE",
@@ -16,7 +23,14 @@ describe("Characters Integration Tests - delete", () => {
         null,
         noop
       )) as SuccessResponse<null>;
+    });
+
+    it("should return successfull response", async () => {
       expect(response.statusCode).toEqual(204);
+    });
+
+    it("should remove character from database", async () => {
+      expect(await findCharacter("Darth Vader")).toBeNull();
     });
   });
 

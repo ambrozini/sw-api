@@ -33,8 +33,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should add character to database", async () => {
-      const character = await findCharacter("Master Yoda");
-      expect(character).toMatchInlineSnapshot(`
+      expect(await findCharacter("Master Yoda")).toMatchInlineSnapshot(`
         {
           "episodes": [
             "EMPIRE",
@@ -139,8 +138,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should not add character", async () => {
-      const character = await findCharacter("Master Yoda");
-      expect(character).toEqual("Such character doesn't exists");
+      expect(await findCharacter("Master Yoda")).toBeNull();
     });
   });
 
@@ -170,8 +168,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should not add character", async () => {
-      const character = await findCharacter("Master Yoda");
-      expect(character).toEqual("Such character doesn't exists");
+      expect(await findCharacter("Master Yoda")).toBeNull();
     });
   });
 
@@ -200,8 +197,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should not add character", async () => {
-      const character = await findCharacter("Master Yoda");
-      expect(character).toEqual("Such character doesn't exists");
+      expect(await findCharacter("Master Yoda")).toBeNull();
     });
   });
 
@@ -235,8 +231,7 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should not add character", async () => {
-      const character = await findCharacter("Master Yoda");
-      expect(character).toEqual("Such character doesn't exists");
+      expect(await findCharacter("Master Yoda")).toBeNull();
     });
   });
 });
