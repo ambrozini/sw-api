@@ -3,11 +3,18 @@ import { noop } from "lodash";
 import { Character, Episodes } from "src/characters/model/character";
 import { update } from "../../src/characters/handler";
 import * as service from "../../src/characters/characters-service";
+import { findCharacter } from "./helpers/findCharacter";
+import { CharacterRepository } from "src/characters/character-repository";
 
 describe("Characters Integration Tests - update", () => {
+  beforeEach(() => {
+    CharacterRepository.getInstance().clearData();
+  });
+
   describe("with valid data", () => {
     let response: SuccessResponse;
-    it("should return successfull response", async () => {
+
+    beforeEach(async () => {
       response = (await update(
         {
           httpMethod: "PUT",
@@ -19,7 +26,21 @@ describe("Characters Integration Tests - update", () => {
         null,
         noop
       )) as SuccessResponse;
+    });
+
+    it("should return successfull response", () => {
       expect(response.statusCode).toEqual(204);
+    });
+
+    it("should update character in database", async () => {
+      expect(await findCharacter("Luke Skywalker")).toMatchInlineSnapshot(`
+        {
+          "episodes": [
+            "EMPIRE",
+          ],
+          "name": "Luke Skywalker",
+        }
+      `);
     });
   });
 
@@ -48,7 +69,7 @@ describe("Characters Integration Tests - update", () => {
     });
   });
 
-  describe("with empty list of episodes", () => {
+  describe("with non existing character", () => {
     let response: ErrorResponse;
 
     beforeEach(async () => {
@@ -97,6 +118,20 @@ describe("Characters Integration Tests - update", () => {
     it("should return error message", async () => {
       expect(response.body).toEqual("Episodes list doesn't exists");
     });
+
+    it("should not change existing character", async () => {
+      const character = await findCharacter("Luke Skywalker");
+      expect(character).toMatchInlineSnapshot(`
+        {
+          "episodes": [
+            "NEWHOPE",
+            "EMPIRE",
+            "JEDI",
+          ],
+          "name": "Luke Skywalker",
+        }
+      `);
+    });
   });
 
   describe("with not existing episode", () => {
@@ -123,30 +158,19 @@ describe("Characters Integration Tests - update", () => {
     it("should return error message", async () => {
       expect(response.body).toEqual("Such episode doesn't exist");
     });
-  });
 
-  describe("without not existing character", () => {
-    let response: ErrorResponse;
-
-    beforeEach(async () => {
-      response = (await update(
+    it("should not change existing character", async () => {
+      const character = await findCharacter("Luke Skywalker");
+      expect(character).toMatchInlineSnapshot(`
         {
-          httpMethod: "PUT",
-          body: {
-            name: "Master Yoda",
-          },
-        } as HttpEvent<Character>,
-        null,
-        noop
-      )) as ErrorResponse;
-    });
-
-    it("should return error code 400", async () => {
-      expect(response.statusCode).toEqual(400);
-    });
-
-    it("should return error message", async () => {
-      expect(response.body).toEqual("Episodes list doesn't exists");
+          "episodes": [
+            "NEWHOPE",
+            "EMPIRE",
+            "JEDI",
+          ],
+          "name": "Luke Skywalker",
+        }
+      `);
     });
   });
 

@@ -79,4 +79,13 @@ export class CharacterRepository {
       (character) => character.name !== name
     );
   }
+
+  update(characterToUpdate: Character) {
+    this.characters = [
+      ...this.characters.filter(
+        (character) => character.name !== characterToUpdate.name
+      ),
+      characterToUpdate,
+    ];
+  }
 }

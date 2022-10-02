@@ -110,12 +110,7 @@ export const update = (
     return errorAction("NOT_EXISTS");
   }
 
-  // characterList = [
-  //   ...characterList.filter(
-  //     (currentCharacter) => currentCharacter.name === character.name
-  //   ),
-  //   character,
-  // ];
+  repository.update(character);
 
   return successAction();
 };
