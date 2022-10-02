@@ -2,13 +2,8 @@ import { HttpEvent, SuccessResponse } from "@shared";
 import { find } from "../../src/characters/handler";
 import { noop } from "lodash";
 import { Character } from "src/characters/model/character";
-import { seedDb } from "./helpers/seedDb";
 
 describe("Characters Integration Tests - find", () => {
-  beforeEach(async () => {
-    await seedDb();
-  });
-
   describe("with default limitation", () => {
     let response: SuccessResponse<Character[]>;
 
@@ -26,7 +21,7 @@ describe("Characters Integration Tests - find", () => {
     });
 
     it("should return 5 entries", () => {
-      expect(response.body.length).toEqual(5);
+      expect(JSON.parse(response.body).length).toEqual(5);
     });
 
     it("should return first 5 entries", () => {
@@ -54,7 +49,7 @@ describe("Characters Integration Tests - find", () => {
     });
 
     it("should return 2 entries", () => {
-      expect(response.body.length).toEqual(2);
+      expect(JSON.parse(response.body).length).toEqual(2);
     });
   });
 
@@ -102,7 +97,7 @@ describe("Characters Integration Tests - find", () => {
     });
 
     it("should return 5 entries", () => {
-      expect(response.body.length).toEqual(5);
+      expect(JSON.parse(response.body).length).toEqual(5);
     });
 
     it("should return entries between 2 and 7", () => {
@@ -151,7 +146,7 @@ describe("Characters Integration Tests - find", () => {
         {
           httpMethod: "GET",
           queryStringParameters: {
-            offset: firstPageResponse.body.length,
+            offset: JSON.parse(firstPageResponse.body).length,
           },
         } as unknown as HttpEvent<null>,
         null,

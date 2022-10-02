@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "API for managing characters from 'Start Wars'",
   "scripts": {
-    "test": "jest",
-    "test:dev": "jest --watch-all",
+    "test": "jest --runInBand",
+    "test:dev": "jest --watch-all --runInBand",
     "start": "serverless offline",
     "start:dev": "nodemon --exec serverless offline",
     "debug": "export SLS_DEBUG=* && nodemon --exec serverless offline",
@@ -16,6 +16,7 @@
   "dependencies": {
     "@middy/core": "^2.5.3",
     "@middy/http-json-body-parser": "^2.5.3",
+    "@shelf/jest-mongodb": "^4.1.0",
     "http-status-codes": "^2.2.0",
     "lodash": "^4.17.21",
     "mongodb": "^4.10.0"

@@ -2,13 +2,8 @@ import { HttpEvent, SuccessResponse, ErrorResponse } from "@shared";
 import { deleteOne } from "../../src/characters/handler";
 import { noop } from "lodash";
 import { findCharacter } from "./helpers/findCharacter";
-import { seedDb } from "./helpers/seedDb";
 
 describe("Characters Integration Tests - delete", () => {
-  beforeEach(async () => {
-    await seedDb();
-  });
-
   describe("with valid name", () => {
     let response: SuccessResponse<null>;
 

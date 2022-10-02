@@ -4,13 +4,8 @@ import { Character, Episodes } from "src/characters/model/character";
 import { create } from "../../src/characters/handler";
 import * as service from "../../src/characters/characters-service";
 import { findCharacter } from "./helpers/findCharacter";
-import { seedDb } from "./helpers/seedDb";
 
 describe("Characters Integration Tests - create", () => {
-  beforeEach(async () => {
-    await seedDb();
-  });
-
   describe("with valid data", () => {
     let response: SuccessResponse;
 
@@ -33,15 +28,9 @@ describe("Characters Integration Tests - create", () => {
     });
 
     it("should add character to database", async () => {
-      expect(await findCharacter("Master Yoda")).toMatchInlineSnapshot(`
-        {
-          "episodes": [
-            "EMPIRE",
-            "JEDI",
-          ],
-          "name": "Master Yoda",
-        }
-      `);
+      expect(await findCharacter("Master Yoda")).toMatchInlineSnapshot(
+        `"{"name":"Master Yoda","episodes":["EMPIRE","JEDI"]}"`
+      );
     });
   });
 
@@ -72,16 +61,9 @@ describe("Characters Integration Tests - create", () => {
 
     it("should not change existing character", async () => {
       const character = await findCharacter("Luke Skywalker");
-      expect(character).toMatchInlineSnapshot(`
-        {
-          "episodes": [
-            "NEWHOPE",
-            "EMPIRE",
-            "JEDI",
-          ],
-          "name": "Luke Skywalker",
-        }
-      `);
+      expect(character).toMatchInlineSnapshot(
+        `"{"name":"Luke Skywalker","episodes":["NEWHOPE","EMPIRE","JEDI"]}"`
+      );
     });
   });
 

@@ -1,6 +1,7 @@
 import { Character } from "./model/character";
 
 import { MongoClient } from "mongodb";
+import { getDbClient } from "src/shared/get-db-client";
 
 export class CharacterRepository {
   private static instance: CharacterRepository;
@@ -8,7 +9,7 @@ export class CharacterRepository {
   private client: MongoClient;
 
   private constructor() {
-    this.client = new MongoClient(process.env.MONGO_URI);
+    this.client = getDbClient();
   }
 
   static async getInstance(): Promise<CharacterRepository> {
@@ -21,31 +22,27 @@ export class CharacterRepository {
     return this.instance;
   }
 
-  find({
+  async find({
     limit = 5,
     offset = 0,
   }: {
     limit: number;
     offset: number;
   }): Promise<Character[]> {
-    console.log(limit);
-    console.log(offset);
-
-    return (
-      this.client
-        .db("sw")
-        .collection("characters")
-        // .find<Character>({ skip: offset, limit, _id: false })
-        .find<Character>({ _id: false })
-        .toArray()
-    );
+    return this.client
+      .db("sw")
+      .collection("characters")
+      .find<Character>({}, { projection: { _id: 0 } })
+      .skip(offset)
+      .limit(limit)
+      .toArray();
   }
 
-  findOne(name: string): Promise<Character | null> {
-    return this.client.db("sw").collection("characters").findOne<Character>({
-      name,
-      _id: false,
-    });
+  async findOne(name: string): Promise<Character | null> {
+    return this.client
+      .db("sw")
+      .collection("characters")
+      .findOne<Character>({ name }, { projection: { _id: 0 } });
   }
 
   async exists(name: string): Promise<boolean> {
@@ -55,8 +52,6 @@ export class CharacterRepository {
       .countDocuments({
         name,
       });
-
-    console.log(name);
 
     return count === 1;
   }
@@ -73,6 +68,6 @@ export class CharacterRepository {
     await this.client
       .db("sw")
       .collection("characters")
-      .updateOne({ name: characterToUpdate.name }, characterToUpdate);
+      .replaceOne({ name: characterToUpdate.name }, characterToUpdate);
   }
 }

@@ -4,13 +4,8 @@ import { Character, Episodes } from "src/characters/model/character";
 import { update } from "../../src/characters/handler";
 import * as service from "../../src/characters/characters-service";
 import { findCharacter } from "./helpers/findCharacter";
-import { seedDb } from "./helpers/seedDb";
 
 describe("Characters Integration Tests - update", () => {
-  beforeEach(async () => {
-    await seedDb();
-  });
-
   describe("with valid data", () => {
     let response: SuccessResponse;
 
@@ -33,14 +28,9 @@ describe("Characters Integration Tests - update", () => {
     });
 
     it("should update character in database", async () => {
-      expect(await findCharacter("Luke Skywalker")).toMatchInlineSnapshot(`
-        {
-          "episodes": [
-            "EMPIRE",
-          ],
-          "name": "Luke Skywalker",
-        }
-      `);
+      expect(await findCharacter("Luke Skywalker")).toMatchInlineSnapshot(
+        `"{"name":"Luke Skywalker","episodes":["EMPIRE"]}"`
+      );
     });
   });
 
@@ -121,16 +111,9 @@ describe("Characters Integration Tests - update", () => {
 
     it("should not change existing character", async () => {
       const character = await findCharacter("Luke Skywalker");
-      expect(character).toMatchInlineSnapshot(`
-        {
-          "episodes": [
-            "NEWHOPE",
-            "EMPIRE",
-            "JEDI",
-          ],
-          "name": "Luke Skywalker",
-        }
-      `);
+      expect(character).toMatchInlineSnapshot(
+        `"{"name":"Luke Skywalker","episodes":["NEWHOPE","EMPIRE","JEDI"]}"`
+      );
     });
   });
 
@@ -161,16 +144,9 @@ describe("Characters Integration Tests - update", () => {
 
     it("should not change existing character", async () => {
       const character = await findCharacter("Luke Skywalker");
-      expect(character).toMatchInlineSnapshot(`
-        {
-          "episodes": [
-            "NEWHOPE",
-            "EMPIRE",
-            "JEDI",
-          ],
-          "name": "Luke Skywalker",
-        }
-      `);
+      expect(character).toMatchInlineSnapshot(
+        `"{"name":"Luke Skywalker","episodes":["NEWHOPE","EMPIRE","JEDI"]}"`
+      );
     });
   });
 
