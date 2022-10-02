@@ -3,11 +3,18 @@ import { noop } from "lodash";
 import { Character, Episodes } from "src/characters/model/character";
 import { create } from "../../src/characters/handler";
 import * as service from "../../src/characters/characters-service";
+import { CharacterRepository } from "src/characters/character-repository";
+import { findCharacter } from "./helpers/findCharacter";
 
 describe("Characters Integration Tests - create", () => {
+  beforeEach(() => {
+    CharacterRepository.getInstance().clearData();
+  });
+
   describe("with valid data", () => {
     let response: SuccessResponse;
-    it("should return successfull response", async () => {
+
+    beforeEach(async () => {
       response = (await create(
         {
           httpMethod: "POST",
@@ -19,7 +26,23 @@ describe("Characters Integration Tests - create", () => {
         null,
         noop
       )) as SuccessResponse;
+    });
+
+    it("should return successfull response", () => {
       expect(response.statusCode).toEqual(201);
+    });
+
+    it("should add character to database", async () => {
+      const character = await findCharacter("Master Yoda");
+      expect(character).toMatchInlineSnapshot(`
+        {
+          "episodes": [
+            "EMPIRE",
+            "JEDI",
+          ],
+          "name": "Master Yoda",
+        }
+      `);
     });
   });
 
@@ -32,7 +55,7 @@ describe("Characters Integration Tests - create", () => {
           httpMethod: "POST",
           body: {
             name: "Luke Skywalker",
-            episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
+            episodes: [Episodes.NEWHOPE, Episodes.JEDI],
           },
         } as HttpEvent<Character>,
         null,
@@ -46,6 +69,20 @@ describe("Characters Integration Tests - create", () => {
 
     it("should return error message", async () => {
       expect(response.body).toEqual("Character with such name already exists");
+    });
+
+    it("should not change existing character", async () => {
+      const character = await findCharacter("Luke Skywalker");
+      expect(character).toMatchInlineSnapshot(`
+        {
+          "episodes": [
+            "NEWHOPE",
+            "EMPIRE",
+            "JEDI",
+          ],
+          "name": "Luke Skywalker",
+        }
+      `);
     });
   });
 
@@ -100,6 +137,11 @@ describe("Characters Integration Tests - create", () => {
         "Character have to be at least in one episode"
       );
     });
+
+    it("should not add character", async () => {
+      const character = await findCharacter("Master Yoda");
+      expect(character).toEqual("Such character doesn't exists");
+    });
   });
 
   describe("with not existing episode", () => {
@@ -126,6 +168,11 @@ describe("Characters Integration Tests - create", () => {
     it("should return error message", async () => {
       expect(response.body).toEqual("Such episode doesn't exist");
     });
+
+    it("should not add character", async () => {
+      const character = await findCharacter("Master Yoda");
+      expect(character).toEqual("Such character doesn't exists");
+    });
   });
 
   describe("without list of episodes", () => {
@@ -150,6 +197,11 @@ describe("Characters Integration Tests - create", () => {
 
     it("should return error message", async () => {
       expect(response.body).toEqual("Episodes list doesn't exists");
+    });
+
+    it("should not add character", async () => {
+      const character = await findCharacter("Master Yoda");
+      expect(character).toEqual("Such character doesn't exists");
     });
   });
 
@@ -180,6 +232,11 @@ describe("Characters Integration Tests - create", () => {
       expect(response.body).toEqual(
         "Something went wrong! Please contact administration"
       );
+    });
+
+    it("should not add character", async () => {
+      const character = await findCharacter("Master Yoda");
+      expect(character).toEqual("Such character doesn't exists");
     });
   });
 });

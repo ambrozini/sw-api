@@ -51,7 +51,7 @@ export const create = (
     return errorAction("VALIDATION_ERROR", "Such episode doesn't exist");
   }
 
-  // characterList.push(character);
+  repository.create(character);
 
   return successAction();
 };

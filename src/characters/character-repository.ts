@@ -7,6 +7,18 @@ export class CharacterRepository {
   private characters: Character[] = [];
 
   private constructor() {
+    this.clearData();
+  }
+
+  static getInstance(): CharacterRepository {
+    if (!this.instance) {
+      this.instance = new CharacterRepository();
+    }
+
+    return this.instance;
+  }
+
+  clearData() {
     this.characters = [
       {
         name: "Luke Skywalker",
@@ -38,15 +50,7 @@ export class CharacterRepository {
         episodes: [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
       },
     ];
-  }
-
-  static getInstance(): CharacterRepository {
-    if (!this.instance) {
-      this.instance = new CharacterRepository();
-    }
-
-    return this.instance;
-  }
+  } // TODO remove when switching into real db
 
   find({
     limit = 5,
@@ -64,5 +68,9 @@ export class CharacterRepository {
 
   exists(predicate: (character: Character) => boolean): boolean {
     return this.characters.some((character) => predicate(character));
+  }
+
+  create(character: Character) {
+    this.characters.push(character);
   }
 }
