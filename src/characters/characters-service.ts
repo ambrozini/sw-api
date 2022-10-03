@@ -1,6 +1,7 @@
-import { ActionResult, errorAction, successAction } from "@shared";
+import { ActionResult, errorAction, successAction, validate } from "@shared";
 import { CharacterRepository } from "./character-repository";
-import { Character, Episodes } from "./model/character";
+import { commonValidator } from "./characters-validator";
+import { Character } from "./model/character";
 import { CharacterServiceErrors } from "./model/errors";
 
 export const find = async (options: {
@@ -23,27 +24,10 @@ export const create = async (
     return errorAction("ALREADY_EXISTS");
   }
 
-  if (!character.name) {
-    return errorAction("VALIDATION_ERROR", "Name doesn't exists");
-  }
+  const validationError = validate([commonValidator], character);
 
-  if (!character.episodes) {
-    return errorAction("VALIDATION_ERROR", "Episodes list doesn't exists");
-  }
-
-  if (character.episodes.length === 0) {
-    return errorAction(
-      "VALIDATION_ERROR",
-      "Character have to be at least in one episode"
-    );
-  }
-
-  if (
-    character.episodes.some(
-      (episode) => !Object.values(Episodes).includes(episode)
-    )
-  ) {
-    return errorAction("VALIDATION_ERROR", "Such episode doesn't exist");
+  if (validationError) {
+    return validationError;
   }
 
   await repository.create(character);
@@ -74,27 +58,10 @@ export const update = async (
 ): Promise<ActionResult<null, CharacterServiceErrors>> => {
   const repository = await CharacterRepository.getInstance();
 
-  if (!character.name) {
-    return errorAction("VALIDATION_ERROR", "Name doesn't exists");
-  }
+  const validationError = validate([commonValidator], character);
 
-  if (!character.episodes) {
-    return errorAction("VALIDATION_ERROR", "Episodes list doesn't exists");
-  }
-
-  if (character.episodes.length === 0) {
-    return errorAction(
-      "VALIDATION_ERROR",
-      "Character have to be at least in one episode"
-    );
-  }
-
-  if (
-    character.episodes.some(
-      (episode) => !Object.values(Episodes).includes(episode)
-    )
-  ) {
-    return errorAction("VALIDATION_ERROR", "Such episode doesn't exist");
+  if (validationError) {
+    return validationError;
   }
 
   if (!(await repository.exists(character.name))) {

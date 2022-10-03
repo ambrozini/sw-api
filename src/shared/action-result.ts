@@ -1,4 +1,4 @@
-type ErrorList = readonly string[];
+export type ErrorList = readonly string[];
 
 export interface SuccessResult<T> {
   success: true;
