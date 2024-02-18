@@ -9,9 +9,9 @@ module.exports = {
   modulePaths: [
       '<rootDir>'
   ],
-  globalSetup: "<rootDir>/__test__/globalSetup.ts",
-  globalTeardown: "<rootDir>/__test__/globalTeardown.ts",
-  setupFilesAfterEnv: [
-    "<rootDir>/__test__/setupFile.ts"
-  ]
+  // globalSetup: "<rootDir>/__test__/globalSetup.ts",
+  // globalTeardown: "<rootDir>/__test__/globalTeardown.ts",
+  // setupFilesAfterEnv: [
+  //   "<rootDir>/__test__/setupFile.ts"
+  // ]
 };
